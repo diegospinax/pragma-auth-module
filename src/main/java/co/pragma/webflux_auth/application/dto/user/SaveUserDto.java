@@ -1,4 +1,6 @@
-package co.pragma.webflux_auth.application.dto;
+package co.pragma.webflux_auth.application.dto.user;
+
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
@@ -9,6 +11,8 @@ public record SaveUserDto(
         String address,
         String phoneNumber,
         String email,
-        Double salary
+        Double salary,
+        @NotNull(message = "Role id is required.")
+        Long roleId
 ) {
 }

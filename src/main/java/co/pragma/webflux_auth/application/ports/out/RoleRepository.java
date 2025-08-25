@@ -1,0 +1,16 @@
+package co.pragma.webflux_auth.application.ports.out;
+
+
+import co.pragma.webflux_auth.domain.role.Role;
+import co.pragma.webflux_auth.domain.role.valueObjects.RoleName;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+public interface RoleRepository {
+    Mono<Role> createRole(Role role);
+    Flux<Role> findAll();
+    Mono<Role> findById(Long roleId);
+    Mono<Role> findByName(RoleName name);
+    Mono<Role> updateRole(Role role);
+    Mono<Void> deleteRole(Long roleId);
+}

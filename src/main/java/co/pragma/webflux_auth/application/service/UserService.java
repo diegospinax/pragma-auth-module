@@ -1,19 +1,27 @@
 package co.pragma.webflux_auth.application.service;
 
-import co.pragma.webflux_auth.application.dto.SaveUserDto;
-import co.pragma.webflux_auth.application.ports.in.*;
+import co.pragma.webflux_auth.application.dto.user.SaveUserDto;
+import co.pragma.webflux_auth.application.ports.in.user.CreateUserUseCase;
+import co.pragma.webflux_auth.application.ports.in.user.DeleteUserUseCase;
+import co.pragma.webflux_auth.application.ports.in.user.FindUserUseCase;
+import co.pragma.webflux_auth.application.ports.in.user.UpdateUserUseCase;
+import co.pragma.webflux_auth.application.ports.out.RoleRepository;
 import co.pragma.webflux_auth.application.ports.out.UserRepository;
+import co.pragma.webflux_auth.application.service.support.UserUpdateHelper;
+import co.pragma.webflux_auth.domain.role.Role;
 import co.pragma.webflux_auth.domain.user.User;
-import co.pragma.webflux_auth.domain.user.valueObjects.*;
+import co.pragma.webflux_auth.domain.user.valueObjects.UserEmail;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class UserService implements CreateUserUseCase, FindUserUseCase, UpdateUserUseCase, DeleteUserUseCase {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
     }
 
     @Override
@@ -49,33 +57,37 @@ public class UserService implements CreateUserUseCase, FindUserUseCase, UpdateUs
     public Mono<User> updateUser(Long userId, SaveUserDto userDto) {
         return userRepository.findById(userId)
                 .switchIfEmpty(Mono.error(new RuntimeException("User does not exists.")))
-                .flatMap(user -> {
-                    User updatedUser = handleUpdateUserFromSaveDto(user, userDto);
-                    if (user.email() != updatedUser.email()) {
-                        return userRepository.findByEmail(updatedUser.email())
-                                .hasElement()
-                                .flatMap(exists -> {
-                                    if (exists) {
-                                        return Mono.error(new RuntimeException("Email already registered."));
-                                    }
-                                    return userRepository.updateUser(updatedUser);
-                                });
-                    }
-                    return userRepository.updateUser(updatedUser);
+                .flatMap(existingUser -> {
+                    Mono<User> updatedUserMono = updateUserFieldsFromSaveDto(existingUser, userDto);
+                    return updatedUserMono
+                            .flatMap(updatedUser -> validateEmailAvailable(updatedUser, existingUser))
+                            .flatMap(user -> userRepository.updateUser(user));
                 });
     }
 
-    private User handleUpdateUserFromSaveDto(User user, SaveUserDto userDto) {
-        return new User(
-                user.id(),
-                userDto.name() != null ? new UserName(userDto.name()) : user.name(),
-                userDto.lastname() != null ? new UserLastname(userDto.lastname()) : user.lastname(),
-                userDto.dateBirth() != null ? new UserDateBirth(userDto.dateBirth()) : user.dateBirth(),
-                userDto.address() != null ? new UserAddress(userDto.address()) : user.address(),
-                userDto.phoneNumber() != null ? new UserPhoneNumber(userDto.phoneNumber()) : user.phoneNumber(),
-                userDto.email() != null ? new UserEmail(userDto.email()) : user.email(),
-                userDto.salary() != null ? new UserSalary(userDto.salary()) : user.salary()
-        );
+    private Mono<User> updateUserFieldsFromSaveDto(User user, SaveUserDto userDto) {
+        UserUpdateHelper updateHelper = new UserUpdateHelper();
+        if (userDto.roleId() == null) {
+            return Mono.just(updateHelper.updateFields(user, userDto, user.role()));
+        }
+        return roleRepository.findById(userDto.roleId())
+                .switchIfEmpty(Mono.error(new RuntimeException("Role does not exists.")))
+                .map(role -> updateHelper.updateFields(user, userDto, role));
+
+    }
+
+    private Mono<User> validateEmailAvailable(User updatedUser, User existingUser) {
+        if (existingUser.email().value.equals(updatedUser.email().value)) {
+            return Mono.just(updatedUser);
+        }
+        return userRepository.findByEmail(updatedUser.email())
+                .hasElement()
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.error(new RuntimeException("Email already registered."));
+                    }
+                    return Mono.just(updatedUser);
+                });
     }
 
     @Override

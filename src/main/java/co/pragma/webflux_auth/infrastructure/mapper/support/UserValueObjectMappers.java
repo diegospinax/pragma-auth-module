@@ -7,7 +7,7 @@ import org.mapstruct.Named;
 import java.time.LocalDate;
 
 @Mapper(componentModel = "spring")
-public interface ValueObjectMappers {
+public interface UserValueObjectMappers {
 
     @Named("toUserName")
     default UserName toUserName(String name) {

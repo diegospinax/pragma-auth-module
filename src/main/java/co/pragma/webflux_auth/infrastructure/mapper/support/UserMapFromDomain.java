@@ -13,5 +13,6 @@ import java.lang.annotation.RetentionPolicy;
 @Mapping(target = "phoneNumber", source = "phoneNumber.value")
 @Mapping(target = "email", source = "email.value")
 @Mapping(target = "salary", source = "salary.value")
-public @interface MapFromDomain {
+@Mapping(target = "roleId", source = "role.id")
+public @interface UserMapFromDomain {
 }

@@ -1,6 +1,9 @@
 package co.pragma.webflux_auth.infrastructure.config.exceptions;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ServerWebExchange;
@@ -9,26 +12,33 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ServerWebInputException.class)
-    public Mono<ResponseEntity<ExceptionResponse>> handleInvalidBodyProvided(ServerWebExchange exchange) {
+    public ResponseEntity<Mono<ExceptionResponse>> handleInvalidParametersProvided(ServerWebInputException e, ServerWebExchange exchange) {
+        String message = "Bad request";
+
+        if (e.getReason() != null && e.getReason().contains("Validation failure")) {
+            message = "Validation failure";
+        }
+
         ExceptionResponse response = new ExceptionResponse(
-                "Bad request",
+                message,
                 LocalDateTime.now() ,
                 exchange.getRequest().getPath().value()
         );
-        return Mono.just(ResponseEntity.badRequest().body(response));
+        return new ResponseEntity<>(Mono.just(response), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public Mono<ResponseEntity<ExceptionResponse>> handleRuntimeException(RuntimeException e, ServerWebExchange exchange) {
+    public ResponseEntity<Mono<ExceptionResponse>> handleGenericException(RuntimeException e, ServerWebExchange exchange) {
         ExceptionResponse response = new ExceptionResponse(
                 e.getMessage(),
                 LocalDateTime.now() ,
                 exchange.getRequest().getPath().value()
         );
-        return Mono.just(ResponseEntity.badRequest().body(response));
+        return new ResponseEntity<>(Mono.just(response), HttpStatus.BAD_REQUEST);
     }
 }

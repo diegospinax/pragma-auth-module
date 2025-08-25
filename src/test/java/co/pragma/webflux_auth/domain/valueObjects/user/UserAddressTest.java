@@ -18,14 +18,14 @@ public class UserAddressTest {
 
     @Test
     public void validAddress() {
-        UserAddress userAddress = new UserAddress("Calle_161_#54-10._Bogotá,_Colombia");
-        Assertions.assertEquals("CALLE_161_#54-10._BOGOTÁ,_COLOMBIA", userAddress.value);
+        UserAddress userAddress = new UserAddress("Calle_16_#75-10._Manizales,_Colombia");
+        Assertions.assertEquals("CALLE_16_#75-10._MANIZALES,_COLOMBIA", userAddress.value);
     }
 
     @Test
     public void invalidAddress () {
         Exception exception = Assertions.assertThrows(UserValidationException.class, () -> {
-            new UserAddress("Calle_161_#54-10._Bogotá123123,_Colombia");
+            new UserAddress("Calle_27_#30-02._Bogotá121,_Colombia");
         });
         Assertions.assertEquals("Invalid address provided.", exception.getMessage());
     }

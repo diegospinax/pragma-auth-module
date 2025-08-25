@@ -1,4 +1,6 @@
-package co.pragma.webflux_auth.application.dto;
+package co.pragma.webflux_auth.application.dto.user;
+
+import co.pragma.webflux_auth.application.dto.role.ResponseRoleDto;
 
 import java.time.LocalDate;
 
@@ -10,6 +12,7 @@ public record ResponseUserDto(
         String address,
         String phoneNumber,
         String email,
-        Double salary
+        Double salary,
+        ResponseRoleDto role
 ) {
 }

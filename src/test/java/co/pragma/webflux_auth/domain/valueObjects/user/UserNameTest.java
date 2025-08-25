@@ -18,8 +18,8 @@ public class UserNameTest {
 
     @Test
     public void correctNameTest() {
-        UserName userName = new UserName("diego_andrés");
-        Assertions.assertEquals("DIEGO_ANDRÉS", userName.value);
+        UserName userName = new UserName("juan_felipe");
+        Assertions.assertEquals("JUAN_FELIPE", userName.value);
     }
 
     @Test
@@ -33,7 +33,7 @@ public class UserNameTest {
     @Test
     public void multipleSpacesNameTest() {
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
-            new UserName(" Diego");
+            new UserName(" Carlos");
         });
         Assertions.assertEquals(exceptionMessage, exception.getMessage());
     }
@@ -41,7 +41,7 @@ public class UserNameTest {
     @Test
     public void numbersInNameTest() {
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
-            new UserName("Diego123");
+            new UserName("Danna123");
         });
         Assertions.assertEquals(exceptionMessage, exception.getMessage());
     }

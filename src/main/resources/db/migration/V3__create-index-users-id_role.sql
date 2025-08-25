@@ -1,0 +1,1 @@
+create index idx_users_id_role on users(id_role);

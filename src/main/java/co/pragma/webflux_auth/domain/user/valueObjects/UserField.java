@@ -1,6 +1,6 @@
 package co.pragma.webflux_auth.domain.user.valueObjects;
 
-abstract class UserField<T> {
+public abstract class UserField<T> {
     public T value;
 
     public UserField(T value) {
