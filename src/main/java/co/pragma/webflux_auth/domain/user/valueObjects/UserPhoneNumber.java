@@ -11,8 +11,9 @@ public class UserPhoneNumber extends UserField<String> {
     @Override
     public void validate() {
         String regex = "^\\d{10}$";
-        if (!value.matches(regex)) {
+        if (value == null)
+            throw new UserValidationException("Phone number is required.");
+        if (!value.matches(regex))
             throw new UserValidationException("Invalid phone provided.");
-        }
     }
 }

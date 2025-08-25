@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: webflux-auth
+  webflux:
+    base-path: /api/v1
+  r2dbc:
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    url: r2dbc:postgresql://localhost:5432/${DB_NAME}
+  flyway:
+    user: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/${DB_NAME}
+
+logging:
+  level:
+    org.springframework.r2dbc: DEBUG
+
+

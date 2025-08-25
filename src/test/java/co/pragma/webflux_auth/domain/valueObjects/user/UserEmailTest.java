@@ -7,14 +7,20 @@ import org.junit.jupiter.api.Test;
 
 public class UserEmailTest {
 
-    String exceptionMessage = "Invalid email provided.";
+    @Test
+    public void nullTest() {
+        Exception exception = Assertions.assertThrows(UserValidationException.class, () -> {
+            new UserEmail(null);
+        });
+        Assertions.assertEquals("Email is required.", exception.getMessage());
+    }
 
     @Test
     public void invalidEmail() {
         Exception exception = Assertions.assertThrows(UserValidationException.class, () -> {
             new UserEmail("aeiou@.com");
         });
-        Assertions.assertEquals(exceptionMessage, exception.getMessage());
+        Assertions.assertEquals("Invalid email provided.", exception.getMessage());
     }
 
     @Test

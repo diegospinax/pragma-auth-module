@@ -8,11 +8,18 @@ import org.junit.jupiter.api.Test;
 public class UserPhoneNumberTest {
 
     @Test
+    public void nullTest () {
+        Exception exception = Assertions.assertThrows(UserValidationException.class, () -> {
+            new UserPhoneNumber(null);
+        });
+        Assertions.assertEquals("Phone number is required.", exception.getMessage());
+    }
+
+    @Test
     public void invalidPhoneNumberTest () {
         Exception exception = Assertions.assertThrows(UserValidationException.class, () -> {
             new UserPhoneNumber("12345");
         });
-
         Assertions.assertEquals("Invalid phone provided.", exception.getMessage());
     }
 

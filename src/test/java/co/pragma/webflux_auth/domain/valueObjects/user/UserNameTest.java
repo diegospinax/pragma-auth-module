@@ -9,9 +9,16 @@ public class UserNameTest {
     private final String exceptionMessage = "Names must contain only letters and underscore between them.";
 
     @Test
+    public void nullTest() {
+        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
+            new UserName(null);
+        });
+        Assertions.assertEquals("Name is required.", exception.getMessage());
+    }
+
+    @Test
     public void correctNameTest() {
         UserName userName = new UserName("diego_andrés");
-
         Assertions.assertEquals("DIEGO_ANDRÉS", userName.value);
     }
 
@@ -20,7 +27,6 @@ public class UserNameTest {
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
             new UserName("");
         });
-
         Assertions.assertEquals(exceptionMessage, exception.getMessage());
     }
 
@@ -29,7 +35,6 @@ public class UserNameTest {
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
             new UserName(" Diego");
         });
-
         Assertions.assertEquals(exceptionMessage, exception.getMessage());
     }
 
@@ -38,7 +43,6 @@ public class UserNameTest {
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
             new UserName("Diego123");
         });
-
         Assertions.assertEquals(exceptionMessage, exception.getMessage());
     }
 
@@ -47,7 +51,6 @@ public class UserNameTest {
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
             new UserName("Juan_Esteban_Camilo");
         });
-
         Assertions.assertEquals(exceptionMessage, exception.getMessage());
     }
 }

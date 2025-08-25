@@ -1,23 +1,31 @@
 package co.pragma.webflux_auth.domain.valueObjects.user;
 
-import co.pragma.webflux_auth.domain.user.valueObjects.UserLastName;
+import co.pragma.webflux_auth.domain.user.valueObjects.UserLastname;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class UserLastNameTest {
+public class UserLastnameTest {
 
     private final String exceptionMessage = "Lastnames must contain only letters and underscore between them.";
 
     @Test
+    public void nullTest () {
+        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
+            new UserLastname(null);
+        });
+        Assertions.assertEquals("Lastname is required.", exception.getMessage());
+    }
+
+    @Test
     public void correctLastnameTest () {
-        UserLastName userLastName = new UserLastName("Giraldo_Gonzáles");
+        UserLastname userLastName = new UserLastname("Giraldo_Gonzáles");
         Assertions.assertEquals("GIRALDO_GONZÁLES", userLastName.value);
     }
 
     @Test
     public void emptyLastnameTest () {
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
-            new UserLastName("");
+            new UserLastname("");
         });
         Assertions.assertEquals(exceptionMessage, exception.getMessage());
     }
@@ -25,7 +33,7 @@ public class UserLastNameTest {
     @Test
     public void multipleSpacesLastnameTest () {
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
-            new UserLastName(" Giraldo");
+            new UserLastname(" Giraldo");
         });
         Assertions.assertEquals(exceptionMessage, exception.getMessage());
     }
@@ -33,7 +41,7 @@ public class UserLastNameTest {
     @Test
     public void numbersInLastnameTest () {
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
-           new UserLastName("Giraldo123");
+           new UserLastname("Giraldo123");
         });
         Assertions.assertEquals(exceptionMessage, exception.getMessage());
     }
@@ -41,7 +49,7 @@ public class UserLastNameTest {
     @Test
     public void maxTwoLastnamesTest () {
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
-            new UserLastName("Giraldo_Gonzáles_Suárez");
+            new UserLastname("Giraldo_Gonzáles_Suárez");
         });
         Assertions.assertEquals(exceptionMessage, exception.getMessage());
     }

@@ -11,7 +11,10 @@ public class UserEmail extends UserField<String> {
     @Override
     public void validate() {
         String regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-        if(!value.matches(regex)) {
+        if(value == null){
+            throw new UserValidationException("Email is required.");
+        }
+        if(!value.matches(regex)){
             throw new UserValidationException("Invalid email provided.");
         }
     }

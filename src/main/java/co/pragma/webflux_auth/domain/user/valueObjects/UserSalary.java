@@ -10,8 +10,9 @@ public class UserSalary extends UserField<Double>{
 
     @Override
     public void validate() {
-        if(value < 0d || value > 15_000_000d) {
+        if(value == null)
+            throw new UserValidationException("Salary is required.");
+        if(value < 0d || value > 15_000_000d)
             throw new UserValidationException("Invalid salary provided.");
-        }
     }
 }

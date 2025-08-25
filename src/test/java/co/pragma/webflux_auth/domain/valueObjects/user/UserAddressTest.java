@@ -9,18 +9,23 @@ import org.junit.jupiter.api.Test;
 public class UserAddressTest {
 
     @Test
+    public void nullTest () {
+        Exception exception = Assertions.assertThrows(UserValidationException.class, () -> {
+            new UserAddress(null);
+        });
+        Assertions.assertEquals("Address is required.", exception.getMessage());
+    }
+
+    @Test
     public void validAddress() {
-        UserAddress userAddress = new UserAddress(new Address("Colombia", "Medellin", "123", "#54-10"));
-        Assertions.assertEquals("Colombia", userAddress.value.getCountry());
-        Assertions.assertEquals("Medellin", userAddress.value.getCity());
-        Assertions.assertEquals("123", userAddress.value.getStreetName());
-        Assertions.assertEquals("#54-10", userAddress.value.getStreetNumber());
+        UserAddress userAddress = new UserAddress("Calle_161_#54-10._Bogotá,_Colombia");
+        Assertions.assertEquals("CALLE_161_#54-10._BOGOTÁ,_COLOMBIA", userAddress.value);
     }
 
     @Test
     public void invalidAddress () {
         Exception exception = Assertions.assertThrows(UserValidationException.class, () -> {
-            new UserAddress(new Address("Colombia123", "Manizales", "Alcalá", "#74-65"));
+            new UserAddress("Calle_161_#54-10._Bogotá123123,_Colombia");
         });
         Assertions.assertEquals("Invalid address provided.", exception.getMessage());
     }
