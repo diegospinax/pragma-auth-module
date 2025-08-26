@@ -7,8 +7,8 @@ import co.pragma.webflux_auth.application.ports.in.user.FindUserUseCase;
 import co.pragma.webflux_auth.application.ports.in.user.UpdateUserUseCase;
 import co.pragma.webflux_auth.application.ports.out.RoleRepository;
 import co.pragma.webflux_auth.application.ports.out.UserRepository;
+import co.pragma.webflux_auth.application.service.exception.DataIntegrationValidationException;
 import co.pragma.webflux_auth.application.service.support.UserUpdateHelper;
-import co.pragma.webflux_auth.domain.role.Role;
 import co.pragma.webflux_auth.domain.user.User;
 import co.pragma.webflux_auth.domain.user.valueObjects.UserEmail;
 import reactor.core.publisher.Flux;
@@ -30,7 +30,7 @@ public class UserService implements CreateUserUseCase, FindUserUseCase, UpdateUs
                 .hasElement()
                 .flatMap(exists -> {
                     if (exists)
-                        return Mono.error(new RuntimeException("Email already registered."));
+                        return Mono.error(new DataIntegrationValidationException("Email already registered."));
 
                     return userRepository.createUser(user);
                 });
@@ -44,19 +44,19 @@ public class UserService implements CreateUserUseCase, FindUserUseCase, UpdateUs
     @Override
     public Mono<User> findById(Long userId) {
         return userRepository.findById(userId)
-                .switchIfEmpty(Mono.error(new RuntimeException("User does not exists.")));
+                .switchIfEmpty(Mono.error(new DataIntegrationValidationException("User does not exists.")));
     }
 
     @Override
     public Mono<User> findByEmail(UserEmail email) {
         return userRepository.findByEmail(email)
-                .switchIfEmpty(Mono.error(new RuntimeException("User does not exists.")));
+                .switchIfEmpty(Mono.error(new DataIntegrationValidationException("User does not exists.")));
     }
 
     @Override
     public Mono<User> updateUser(Long userId, SaveUserDto userDto) {
         return userRepository.findById(userId)
-                .switchIfEmpty(Mono.error(new RuntimeException("User does not exists.")))
+                .switchIfEmpty(Mono.error(new DataIntegrationValidationException("User does not exists.")))
                 .flatMap(existingUser -> {
                     Mono<User> updatedUserMono = updateUserFieldsFromSaveDto(existingUser, userDto);
                     return updatedUserMono
@@ -71,7 +71,7 @@ public class UserService implements CreateUserUseCase, FindUserUseCase, UpdateUs
             return Mono.just(updateHelper.updateFields(user, userDto, user.role()));
         }
         return roleRepository.findById(userDto.roleId())
-                .switchIfEmpty(Mono.error(new RuntimeException("Role does not exists.")))
+                .switchIfEmpty(Mono.error(new DataIntegrationValidationException("Role does not exists.")))
                 .map(role -> updateHelper.updateFields(user, userDto, role));
 
     }
@@ -84,7 +84,7 @@ public class UserService implements CreateUserUseCase, FindUserUseCase, UpdateUs
                 .hasElement()
                 .flatMap(exists -> {
                     if (exists) {
-                        return Mono.error(new RuntimeException("Email already registered."));
+                        return Mono.error(new DataIntegrationValidationException("Email already registered."));
                     }
                     return Mono.just(updatedUser);
                 });
@@ -93,7 +93,7 @@ public class UserService implements CreateUserUseCase, FindUserUseCase, UpdateUs
     @Override
     public Mono<Void> deleteUser(Long userId) {
         return userRepository.findById(userId)
-                .switchIfEmpty(Mono.error(new RuntimeException("User does not exists.")))
+                .switchIfEmpty(Mono.error(new DataIntegrationValidationException("User does not exists.")))
                 .flatMap(user -> userRepository.deleteUser(user.id()));
     }
 }
